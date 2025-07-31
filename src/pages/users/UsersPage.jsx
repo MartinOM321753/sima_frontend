@@ -1,67 +1,79 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useMemo } from "react"
 import { useUsers } from "../../hooks/useUsers"
 import { useStorages } from "../../hooks/useStorages"
 import { TableSkeleton } from "../../components/SkeletonLoader"
 import SearchBar from "../../components/SearchBar"
 import Modal from "../../components/Modal"
 import UserForm from "../../components/forms/UserForm"
-import { format } from 'date-fns'
-import { es } from 'date-fns/locale'
+import { format } from "date-fns"
+import { es } from "date-fns/locale"
+
+const ITEMS_PER_PAGE = 5
 
 const UsersPage = () => {
-  const { users, loading, createUser, updateUser, deleteUser } = useUsers()
-  const { storages, fetchStoragesByResponsible } = useStorages()
-  const [userStorage, setUserStorage] = useState(null);
+  const { users, loading, createUser, updateUser, deleteUser, toggleUserStatus } = useUsers()
+  const { fetchStoragesByResponsible } = useStorages()
+  const [userStorage, setUserStorage] = useState(null)
   const [filteredUsers, setFilteredUsers] = useState([])
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [editingUser, setEditingUser] = useState(null)
+  const [currentPage, setCurrentPage] = useState(1)
 
   const handleSearch = (searchTerm) => {
-    if (!searchTerm.trim()) {
+    const term = searchTerm.trim().toLowerCase()
+
+    if (!term) {
       setFilteredUsers([])
       return
     }
 
     const filtered = users
-      .filter((user) => user.rol?.name !== "ADMIN") // <-- excluye admin
+      .filter((user) => user.rol?.name !== "ADMIN")
       .filter(
         (user) =>
-          user.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          user.lastName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          user.username?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          user.email?.toLowerCase().includes(searchTerm.toLowerCase()),
+          user.name?.toLowerCase().includes(term) ||
+          user.lastName?.toLowerCase().includes(term) ||
+          user.username?.toLowerCase().includes(term) ||
+          user.email?.toLowerCase().includes(term)
       )
 
     setFilteredUsers(filtered)
+    setCurrentPage(1)
   }
-
 
   const handleCreateUser = () => {
     setEditingUser(null)
-    setUserStorage(null); // Limpia el almacén
+    setUserStorage(null)
     setIsModalOpen(true)
   }
 
   const handleEditUser = async (user) => {
-    setEditingUser(user);
+    setEditingUser(user)
     if (user?.id) {
-      const storage = await handleGetStorageByResponsable(user.id);
-      setUserStorage(storage);
+      const storage = await handleGetStorageByResponsable(user.id)
+      setUserStorage(storage)
     } else {
-      setUserStorage(null);
+      setUserStorage(null)
     }
-    setIsModalOpen(true);
-  };
-
+    setIsModalOpen(true)
+  }
 
   const handleSubmitUser = async (userData) => {
+    const cleanedData = {
+      ...userData,
+      name: userData.name.trim(),
+      lastName: userData.lastName.trim(),
+      username: userData.username.trim(),
+      email: userData.email.trim(),
+    }
+
     let result
     if (editingUser) {
-      result = await updateUser(editingUser.id, userData)
+      result = await updateUser(editingUser.id, cleanedData)
     } else {
-      result = await createUser(userData)
+      result = await createUser(cleanedData)
     }
 
     if (result.success) {
@@ -69,15 +81,16 @@ const UsersPage = () => {
       setEditingUser(null)
     }
   }
+
   const handleGetStorageByResponsable = async (id) => {
     try {
-      const result = await fetchStoragesByResponsible(id);
-      return result.data; // puede ser null y está bien
+      const result = await fetchStoragesByResponsible(id)
+      return result.data
     } catch (error) {
-      console.warn("No se encontró almacén para este responsable. Esto es esperado en algunos casos.");
-      return null;
+      console.warn("No se encontró almacén para este responsable.")
+      return null
     }
-  };
+  }
 
   const handleDeleteUser = async (id) => {
     await deleteUser(id)
@@ -86,6 +99,20 @@ const UsersPage = () => {
   const displayUsers = (filteredUsers.length > 0 ? filteredUsers : users).filter(
     (user) => user.rol?.name !== "ADMIN"
   )
+
+  const paginatedUsers = useMemo(() => {
+    const start = (currentPage - 1) * ITEMS_PER_PAGE
+    const end = start + ITEMS_PER_PAGE
+    return displayUsers.slice(start, end)
+  }, [displayUsers, currentPage])
+
+  const totalPages = Math.ceil(displayUsers.length / ITEMS_PER_PAGE)
+
+  const handlePageChange = (page) => {
+    if (page >= 1 && page <= totalPages) {
+      setCurrentPage(page)
+    }
+  }
 
   if (loading) {
     return (
@@ -100,13 +127,12 @@ const UsersPage = () => {
 
   return (
     <div className="space-y-6">
-
       <div className="flex justify-between items-center p-1">
         <h1 className="text-h1-mobile md:text-h1-desktop font-bold text-text-titleText">Gestión de Usuarios</h1>
-
-        <div className="flex justify-end items-center  text-black mx-2">
-          <button onClick={handleCreateUser} className="btn-outline ml-4 ">
-            Registar Usuario</button>
+        <div className="flex justify-end items-center text-black mx-2">
+          <button onClick={handleCreateUser} className="btn-outline ml-4">
+            Registrar Usuario
+          </button>
         </div>
       </div>
 
@@ -127,22 +153,38 @@ const UsersPage = () => {
               </tr>
             </thead>
             <tbody>
-            {displayUsers.map((user) => (
+              {paginatedUsers.map((user) => (
                 <tr key={user.id} className="border-b border-gray-100 hover:bg-gray-50">
                   <td className="py-3 px-4 text-text-primary font-medium">
                     {user.name} {user.lastName}
                   </td>
                   <td className="py-3 px-4 text-text">{user.email}</td>
                   <td className="py-3 px-4">
-                  <span className={`px-2 py-1 rounded-full text-xs ${user.active ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}`}>{user.active ? "Activo" : "Inactivo"}</span>
+                    <span
+                      className={`px-2 py-1 rounded-full text-xs ${
+                        user.active ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
+                      }`}
+                    >
+                      {user.active ? "Activo" : "Inactivo"}
+                    </span>
                   </td>
                   <td className="py-3 px-4 text-text">
                     {format(new Date(user.createdAt), "dd 'de' MMMM yyyy", { locale: es })}
                   </td>
                   <td className="py-3 px-4">
-                    <div className="flex gap-2">
+                    <div className="flex gap-2 flex-wrap">
                       <button onClick={() => handleEditUser(user)} className="btn-outline text-sm px-3 py-1">
                         Editar
+                      </button>
+                      <button
+                        onClick={() => toggleUserStatus(user.id)}
+                        className={`text-sm px-3 py-1 rounded-lg transition-colors ${
+                          user.active
+                            ? "bg-yellow-500 text-white hover:bg-yellow-600"
+                            : "bg-green-500 text-white hover:bg-green-600"
+                        }`}
+                      >
+                        {user.active ? "Desactivar" : "Activar"}
                       </button>
                       <button
                         onClick={() => handleDeleteUser(user.id)}
@@ -157,8 +199,43 @@ const UsersPage = () => {
             </tbody>
           </table>
 
-          {displayUsers.length === 0 && <div className="text-center py-8 text-text">No se encontraron usuarios</div>}
+          {displayUsers.length === 0 && (
+            <div className="text-center py-8 text-text">No se encontraron usuarios</div>
+          )}
         </div>
+
+        {/* ✅ Paginación idéntica a la de Storages */}
+        {totalPages > 1 && (
+          <div className="flex justify-center mt-4 gap-2">
+            <button
+              onClick={() => handlePageChange(currentPage - 1)}
+              disabled={currentPage === 1}
+              className="px-3 py-1 bg-primary text-white rounded disabled:opacity-50"
+            >
+              Anterior
+            </button>
+            {Array.from({ length: totalPages }, (_, i) => (
+              <button
+                key={i}
+                onClick={() => handlePageChange(i + 1)}
+                className={`px-3 py-1 rounded ${
+                  currentPage === i + 1
+                    ? "bg-primary text-white"
+                    : "bg-gray-200 text-black hover:bg-gray-300"
+                }`}
+              >
+                {i + 1}
+              </button>
+            ))}
+            <button
+              onClick={() => handlePageChange(currentPage + 1)}
+              disabled={currentPage === totalPages}
+              className="px-3 py-1 bg-primary text-white rounded disabled:opacity-50"
+            >
+              Siguiente
+            </button>
+          </div>
+        )}
       </div>
 
       <Modal

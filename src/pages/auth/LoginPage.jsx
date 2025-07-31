@@ -84,11 +84,11 @@ const LoginPage = () => {
             {({ isSubmitting }) => (
               <Form className="space-y-6">
                 <div>
-                  <label className="block text-sm font-medium text-text-primary mb-2">Correo Electrónico:</label>
+                  <label className="block text-sm font-medium text-text-primary mb-2">Nombre de Usuario:</label>
                   <Field
                     type="text"
                     name="username"
-                    placeholder="Escribe aquí tu correo electrónico"
+                    placeholder="Escribe aquí tu nombre de usuario"
                     className="input-field"
                   />
                   <ErrorMessage name="username" component="div" className="text-red-500 text-sm mt-1" />

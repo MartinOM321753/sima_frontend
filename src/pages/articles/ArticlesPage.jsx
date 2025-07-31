@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useMemo } from "react"
 import { useArticles } from "../../hooks/useArticles"
 import { TableSkeleton } from "../../components/SkeletonLoader"
 import SearchBar from "../../components/SearchBar"
@@ -8,11 +8,14 @@ import Modal from "../../components/Modal"
 import ArticleForm from "../../components/forms/ArticleForm"
 import Swal from "sweetalert2"
 
+const ITEMS_PER_PAGE = 10
+
 const ArticlesPage = () => {
   const { articles, categories, loading, createArticle, updateArticle, deleteArticle, updateQuantity } = useArticles()
   const [filteredArticles, setFilteredArticles] = useState([])
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [editingArticle, setEditingArticle] = useState(null)
+  const [currentPage, setCurrentPage] = useState(1)
 
   const handleSearch = (searchTerm) => {
     if (!searchTerm.trim()) {
@@ -24,9 +27,10 @@ const ArticlesPage = () => {
       (article) =>
         article.articleName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         article.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        article.category?.name?.toLowerCase().includes(searchTerm.toLowerCase()),
+        article.category?.name?.toLowerCase().includes(searchTerm.toLowerCase())
     )
     setFilteredArticles(filtered)
+    setCurrentPage(1) // Reset page when searching
   }
 
   const handleCreateArticle = () => {
@@ -91,6 +95,20 @@ const ArticlesPage = () => {
 
   const displayArticles = filteredArticles.length > 0 ? filteredArticles : articles
 
+  // PAGINACIÓN
+  const totalPages = Math.ceil(displayArticles.length / ITEMS_PER_PAGE)
+
+  const paginatedArticles = useMemo(() => {
+    const start = (currentPage - 1) * ITEMS_PER_PAGE
+    return displayArticles.slice(start, start + ITEMS_PER_PAGE)
+  }, [displayArticles, currentPage])
+
+  const handlePageChange = (page) => {
+    if (page >= 1 && page <= totalPages) {
+      setCurrentPage(page)
+    }
+  }
+
   if (loading) {
     return (
       <div className="space-y-6">
@@ -103,21 +121,19 @@ const ArticlesPage = () => {
   }
 
   return (
-    <div className="space-y-6  ">
+    <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h1 className="text-h1-mobile md:text-h1-desktop font-bold text-text-titleText">Gestión de Artículos</h1>
         <div className="flex justify-end items-center text-black">
-        
-        <button onClick={handleCreateArticle} className="btn-outline ml-4">
-          Agregar Artículo
-        </button>
-      </div>
+          <button onClick={handleCreateArticle} className="btn-outline ml-4">
+            Agregar Artículo
+          </button>
+        </div>
       </div>
 
       <div className="flex-1 justify-between items-center text-black">
         <SearchBar onSearch={handleSearch} placeholder="Escribe el nombre del artículo que deseas buscar" />
       </div>
-      
 
       <div className="card">
         <div className="overflow-x-auto">
@@ -132,7 +148,7 @@ const ArticlesPage = () => {
               </tr>
             </thead>
             <tbody>
-              {displayArticles.map((article) => (
+              {paginatedArticles.map((article) => (
                 <tr key={article.id} className="border-b border-gray-100 hover:bg-gray-50">
                   <td className="py-3 px-4 text-text-primary font-medium">{article.articleName}</td>
                   <td className="py-3 px-4 text-text max-w-xs truncate">{article.description}</td>
@@ -142,14 +158,16 @@ const ArticlesPage = () => {
                         article.quantity === 0
                           ? "bg-red-100 text-red-800"
                           : article.quantity < 10
-                            ? "bg-yellow-100 text-yellow-800"
-                            : "bg-green-100 text-green-800"
+                          ? "bg-yellow-100 text-yellow-800"
+                          : "bg-green-100 text-green-800"
                       }`}
                     >
                       {article.quantity}
                     </span>
                   </td>
-                  <td className="py-3 px-4 text-text">{article.category?.categoryName || "Sin categoría"}</td>
+                  <td className="py-3 px-4 text-text">
+                    {article.category?.categoryName || "Sin categoría"}
+                  </td>
                   <td className="py-3 px-4">
                     <div className="flex gap-2">
                       <button
@@ -178,6 +196,39 @@ const ArticlesPage = () => {
             <div className="text-center py-8 text-text">No se encontraron artículos</div>
           )}
         </div>
+
+        {/* PAGINACIÓN */}
+        {totalPages > 1 && (
+          <div className="flex justify-center items-center mt-4 gap-2">
+            <button
+              onClick={() => handlePageChange(currentPage - 1)}
+              disabled={currentPage === 1}
+              className="px-3 py-1 bg-primary text-white rounded disabled:opacity-50"
+            >
+              Anterior
+            </button>
+            {Array.from({ length: totalPages }, (_, i) => (
+              <button
+                key={i}
+                onClick={() => handlePageChange(i + 1)}
+                className={`px-3 py-1 rounded ${
+                  currentPage === i + 1
+                    ? "bg-primary text-white"
+                    : "bg-gray-200 text-black hover:bg-gray-300"
+                }`}
+              >
+                {i + 1}
+              </button>
+            ))}
+            <button
+              onClick={() => handlePageChange(currentPage + 1)}
+              disabled={currentPage === totalPages}
+              className="px-3 py-1 bg-primary text-white rounded disabled:opacity-50"
+            >
+              Siguiente
+            </button>
+          </div>
+        )}
       </div>
 
       <Modal
