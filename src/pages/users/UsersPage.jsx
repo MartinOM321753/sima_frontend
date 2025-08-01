@@ -161,9 +161,8 @@ const UsersPage = () => {
                   <td className="py-3 px-4 text-text">{user.email}</td>
                   <td className="py-3 px-4">
                     <span
-                      className={`px-2 py-1 rounded-full text-xs ${
-                        user.active ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
-                      }`}
+                      className={`px-2 py-1 rounded-full text-xs ${user.active ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
+                        }`}
                     >
                       {user.active ? "Activo" : "Inactivo"}
                     </span>
@@ -172,26 +171,33 @@ const UsersPage = () => {
                     {format(new Date(user.createdAt), "dd 'de' MMMM yyyy", { locale: es })}
                   </td>
                   <td className="py-3 px-4">
-                    <div className="flex gap-2 flex-wrap">
-                      <button onClick={() => handleEditUser(user)} className="btn-outline text-sm px-3 py-1">
+                    <div className="flex gap-2 flex-wrap items-center">
+                      <button
+                        onClick={() => handleEditUser(user)}
+                        className="btn-outline text-sm px-3 py-1"
+                      >
                         Editar
                       </button>
-                      <button
-                        onClick={() => toggleUserStatus(user.id)}
-                        className={`text-sm px-3 py-1 rounded-lg transition-colors ${
-                          user.active
-                            ? "bg-yellow-500 text-white hover:bg-yellow-600"
-                            : "bg-green-500 text-white hover:bg-green-600"
-                        }`}
-                      >
-                        {user.active ? "Desactivar" : "Activar"}
-                      </button>
+
                       <button
                         onClick={() => handleDeleteUser(user.id)}
                         className="bg-red-500 text-white px-3 py-1 rounded-lg text-sm hover:bg-red-600 transition-colors"
                       >
                         Eliminar
                       </button>
+
+                      <label className="inline-flex items-center cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={user.active}
+                          onChange={() => toggleUserStatus(user.id)}
+                          className="sr-only peer"
+                        />
+                        <div className="w-10 h-5 bg-gray-300 rounded-full peer peer-checked:bg-green-500 relative transition-colors">
+                          <div className="absolute left-1 top-0.5 w-4 h-4 bg-white rounded-full transition peer-checked:translate-x-5" />
+                        </div>
+                      </label>
+                      
                     </div>
                   </td>
                 </tr>
@@ -218,11 +224,10 @@ const UsersPage = () => {
               <button
                 key={i}
                 onClick={() => handlePageChange(i + 1)}
-                className={`px-3 py-1 rounded ${
-                  currentPage === i + 1
+                className={`px-3 py-1 rounded ${currentPage === i + 1
                     ? "bg-primary text-white"
                     : "bg-gray-200 text-black hover:bg-gray-300"
-                }`}
+                  }`}
               >
                 {i + 1}
               </button>
