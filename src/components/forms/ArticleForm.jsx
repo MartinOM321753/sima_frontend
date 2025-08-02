@@ -3,10 +3,27 @@
 import { Formik, Form, Field, ErrorMessage } from "formik"
 import * as Yup from "yup"
 
+// Función para limpiar espacios antes de enviar
+const trimString = (value) => (typeof value === "string" ? value.trim() : value)
+
 const ArticleSchema = Yup.object().shape({
-  articleName: Yup.string().required("El nombre del artículo es requerido"),
-  description: Yup.string().required("La descripción es requerida"),
-  quantity: Yup.number().min(0, "La cantidad debe ser mayor o igual a 0").required("La cantidad es requerida"),
+  articleName: Yup.string()
+    .required("El nombre del artículo es requerido")
+    .test(
+      "no-leading-trailing-spaces",
+      "No puede tener espacios al inicio o al final",
+      (val) => val === val?.trim()
+    ),
+  description: Yup.string()
+    .required("La descripción es requerida")
+    .test(
+      "no-leading-trailing-spaces",
+      "No puede tener espacios al inicio o al final",
+      (val) => val === val?.trim()
+    ),
+  quantity: Yup.number()
+    .min(0, "La cantidad debe ser mayor o igual a 0")
+    .required("La cantidad es requerida"),
   category: Yup.number().required("La categoría es requerida"),
 })
 
@@ -21,17 +38,32 @@ const ArticleForm = ({ article, onSubmit, onCancel, categories = [] }) => {
     category: article?.category?.id || "",
   }
 
+  const handleSubmit = async (values, { setSubmitting }) => {
+    const cleanedValues = {
+      ...values,
+      articleName: trimString(values.articleName),
+      description: trimString(values.description),
+    }
+
+    await onSubmit(cleanedValues)
+    setSubmitting(false)
+  }
+
   return (
-    <Formik initialValues={initialValues} validationSchema={ArticleSchema} onSubmit={onSubmit}>
+    <Formik
+      initialValues={initialValues}
+      validationSchema={ArticleSchema}
+      onSubmit={handleSubmit}
+    >
       {({ isSubmitting }) => (
-        <Form className="space-y-4  text-black">
+        <Form className="space-y-4 text-black">
           <div>
             <label className="block text-sm font-medium text-text-primary mb-2">Nombre del artículo:</label>
             <Field
               type="text"
               name="articleName"
               placeholder="Escribe el nombre del artículo"
-              className="input-field  "
+              className="input-field"
             />
             <ErrorMessage name="articleName" component="div" className="text-red-500 text-sm mt-1" />
           </div>

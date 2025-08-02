@@ -35,15 +35,15 @@ export const useStorages = () => {
   }
 
   const fetchStoragesByResponsible = async (userId) => {
-  try {
-    const response = await storageService.getByResponsible(userId)
-    console.log("respuesta:", response)
-    return { data: response.data.data }
-  } catch (err) {
-    console.error("Error fetching storages by responsible:", err)
-    return null
+    try {
+      const response = await storageService.getByResponsible(userId)
+      console.log("respuesta:", response)
+      return { data: response.data.data }
+    } catch (err) {
+      console.error("Error fetching storages by responsible:", err)
+      return null
+    }
   }
-}
 
   const createStorage = async (storageData) => {
     try {
@@ -165,13 +165,55 @@ export const useStorages = () => {
     }
   }
 
+  const toggleStorageStatus = async (id) => {
+    try {
+      const result = await Swal.fire({
+        title: "¿Cambiar estado?",
+        text: "¿Deseas cambiar el estado de este almacén?",
+        icon: "question",
+        showCancelButton: true,
+        confirmButtonColor: "#16423C",
+        cancelButtonColor: "#6A9C89",
+        confirmButtonText: "Sí, cambiar",
+        cancelButtonText: "Cancelar",
+        customClass: {
+          popup: "rounded-lg",
+          confirmButton: "rounded-lg",
+          cancelButton: "rounded-lg",
+        },
+      })
+
+      if (result.isConfirmed) {
+        await storageService.toggleStatus(id)
+        await fetchStorages()
+
+        Swal.fire({
+          icon: "success",
+          title: "¡Estado actualizado!",
+          text: "El estado del almacén ha sido actualizado",
+          confirmButtonColor: "#16423C",
+          customClass: {
+            popup: "rounded-lg",
+            confirmButton: "rounded-lg",
+          },
+        })
+        return { success: true }
+      }
+
+      return { success: false }
+    } catch (error) {
+      return { success: false, error: error.message }
+    }
+  }
+
+
   useEffect(() => {
     fetchStorages()
     fetchAvailableManagers()
   }, [])
 
   return {
-    
+
     storages,
     availableManagers,
     loading,
@@ -182,5 +224,6 @@ export const useStorages = () => {
     createStorage,
     updateStorage,
     deleteStorage,
+    toggleStorageStatus,
   }
 }
