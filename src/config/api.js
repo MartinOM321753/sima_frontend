@@ -129,6 +129,7 @@ export const articleService = {
   getLowStock: (threshold) => api.get("/api/articles/low-stock", { params: { threshold } }),
   getTotalStock: () => api.get("/api/articles/total/stock"),
   getTotalByCategory: (categoryId) => api.get(`/api/articles/total/category/${categoryId}`),
+  getArticlesByUser : (id) => api.get(`/api/articles/storage/user/${id}`),
 }
 
 export default api

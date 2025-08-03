@@ -21,6 +21,8 @@ const DashboardUser = () => {
     const navigate = useNavigate()
     const id = storedUser?.id || ""
 
+
+
     const { articles: allArticles, assignArticleToStorage, loading: loadingArticles } = useArticles()
 
     const availableArticles = storage && allArticles
@@ -59,7 +61,7 @@ const DashboardUser = () => {
             setLoading(true)
             const [storageResponse, articlesResponse] = await Promise.all([
                 storageService.getByResponsible(id),
-
+                articleService.getArticlesByUser(id),
             ])
 
             setStorage(storageResponse.data.data)
@@ -100,7 +102,7 @@ const DashboardUser = () => {
 
         if (quantity) {
             try {
-                await articleService.removeFromStorage(id, articleId, Number.parseInt(quantity))
+                await articleService.removeFromStorage(storage.id, articleId, Number.parseInt(quantity))
                 await fetchStorageDetails()
 
                 Swal.fire({
@@ -133,6 +135,7 @@ const DashboardUser = () => {
 
     const uniqueArticles = Object.values(groupedArticles);
     const totalQuantity = uniqueArticles.reduce((sum, article) => sum + article.quantity, 0);
+
 
     if (!loading && !storage) {
         return (
@@ -335,7 +338,7 @@ const DashboardUser = () => {
                         </tbody>
                     </table>
 
-                    {storage.length === 0 && <div className="text-center py-8 text-text">No hay artículos en este almacén</div>}
+                    {articles.length === 0 && <div className="text-center py-8 text-text">No hay artículos en este almacén</div>}
                 </div>
             </div>
         </div>
