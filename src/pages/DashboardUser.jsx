@@ -58,8 +58,8 @@ const DashboardUser = () => {
         try {
             setLoading(true)
             const [storageResponse, articlesResponse] = await Promise.all([
-                storageService.getById(id),
-                articleService.getByStorage(id),
+                storageService.getByResponsible(id),
+
             ])
 
             setStorage(storageResponse.data.data)
@@ -335,7 +335,7 @@ const DashboardUser = () => {
                         </tbody>
                     </table>
 
-                    {articles.length === 0 && <div className="text-center py-8 text-text">No hay artículos en este almacén</div>}
+                    {storage.length === 0 && <div className="text-center py-8 text-text">No hay artículos en este almacén</div>}
                 </div>
             </div>
         </div>
