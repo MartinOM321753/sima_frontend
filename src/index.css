@@ -15,7 +15,12 @@ body {
   line-height: 1.6;
 }
 
+.text-primary {
+  color: #16423C;
+}
 @layer components {
+
+
   .btn-primary {
     @apply bg-primary text-white px-6 py-3 rounded-lg font-medium hover:bg-primary/90 transition-colors duration-200;
   }

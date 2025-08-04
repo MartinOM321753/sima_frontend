@@ -131,7 +131,7 @@ const DashboardPage = () => {
         </button>
         <div className="text-center mb-8">
 
-          <h2 className="text-xl font-semibold text-text-titleText">Almacenes ({storages.length})</h2>
+          <h2 className="text-xl font-semibold text-primary">Almacenes ({storages.length})</h2>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-6">

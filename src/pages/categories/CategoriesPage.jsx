@@ -28,7 +28,7 @@ const CategoriesPage = () => {
       category.categoryName?.toLowerCase().includes(term)
     )
     setFilteredCategories(filtered)
-    setCurrentPage(1) // reinicia a la primera página en cada búsqueda
+    setCurrentPage(1) 
   }
 
   const handleCreateCategory = () => {
@@ -45,8 +45,7 @@ const CategoriesPage = () => {
     let result
     const cleanName = values.name.trim()
 
-    if (!cleanName) return // validación básica
-
+    if (!cleanName) return 
     if (editingCategory) {
       result = await updateCategory(editingCategory.id, cleanName)
     } else {
@@ -65,7 +64,6 @@ const CategoriesPage = () => {
 
   const displayCategories = filteredCategories.length > 0 ? filteredCategories : categories
 
-  // PAGINACIÓN: calcula categorías de la página actual
   const paginatedCategories = useMemo(() => {
     const start = (currentPage - 1) * ITEMS_PER_PAGE
     const end = start + ITEMS_PER_PAGE
@@ -84,7 +82,7 @@ const CategoriesPage = () => {
     return (
       <div className="space-y-6">
         <div className="flex justify-between items-center">
-          <h1 className="text-h1-mobile md:text-h1-desktop font-bold text-text-titleText">
+          <h1 className="text-h1-mobile md:text-h1-desktop font-bold text-primary">
             Gestión de Categorías
           </h1>
         </div>
@@ -96,7 +94,7 @@ const CategoriesPage = () => {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-h1-mobile md:text-h1-desktop font-bold text-text-titleText">
+        <h1 className="text-h1-mobile md:text-h1-desktop font-bold text-primary">
           Gestión de Categorías
         </h1>
         <div className="flex justify-end items-center text-black">

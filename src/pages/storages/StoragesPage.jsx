@@ -96,7 +96,7 @@ const StoragesPage = () => {
     return (
       <div className="space-y-6">
         <div className="flex justify-between items-center">
-          <h1 className="text-h1-mobile md:text-h1-desktop font-bold text-text-titleText">Gestión de Almacenes</h1>
+          <h1 className="text-h1-mobile md:text-h1-desktop font-bold text-primary">Gestión de Almacenes</h1>
         </div>
         <TableSkeleton rows={6} columns={5} />
       </div>
@@ -106,15 +106,18 @@ const StoragesPage = () => {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-h1-mobile md:text-h1-desktop font-bold text-text-titleText">Gestión de Almacenes</h1>
+        <h1 className="text-h1-mobile md:text-h1-desktop font-bold text-primary">Gestión de Almacenes</h1>
         <button onClick={handleCreateStorage} className="btn-outline ml-4">
           Registrar Almacén
         </button>
       </div>
 
+      <div className="flex-1 justify-between items-center text-black">
+
       <SearchBar className="flex-1 justify-between items-center text-black"
         onSearch={handleSearch} placeholder="Escribe el nombre del almacén que deseas buscar"
       />
+      </div>
 
       {displayStorages.length === 0 ? (
         <div className="text-center py-8 text-text">No se encontraron almacenes</div>

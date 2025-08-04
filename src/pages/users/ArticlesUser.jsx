@@ -11,7 +11,6 @@ import Swal from "sweetalert2"
 
 const ArticlesPage = () => {
   const { articles, categories, loading, createArticle, updateArticle, deleteArticle, updateQuantity } = useArticles()
-  const [storages, setStorages] = useState(null)
   const [filteredArticles, setFilteredArticles] = useState([])
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [editingArticle, setEditingArticle] = useState(null)
@@ -21,25 +20,24 @@ const ArticlesPage = () => {
 
 
   const handleSearch = (searchTerm) => {
+    // Filtrar sobre los artículos de la categoría seleccionada (o todos si no hay categoría)
+    const baseArticles = category
+      ? articles.filter((a) => a.category?.categoryName?.toLowerCase() === category?.toLowerCase())
+      : articles;
+
     if (!searchTerm.trim()) {
-      const storageIds = storages?.map((s) => s.id) || []
-      const filtered = articles.filter((a) => storageIds.includes(a.storageId))
-      setFilteredArticles(filtered)
-      return
+      setFilteredArticles(baseArticles);
+      return;
     }
 
-    const filtered = articles.filter(
+    const filtered = baseArticles.filter(
       (article) =>
         article.articleName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         article.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        article.category?.name?.toLowerCase().includes(searchTerm.toLowerCase())
-    )
+        article.category?.categoryName?.toLowerCase().includes(searchTerm.toLowerCase())
+    );
 
-
-    const storageIds = storages?.map((s) => s.id) || []
-    const filteredByStorage = filtered.filter((a) => storageIds.includes(a.storageId))
-
-    setFilteredArticles(filteredByStorage)
+    setFilteredArticles(filtered);
   }
 
 
@@ -114,7 +112,7 @@ const ArticlesPage = () => {
     return (
       <div className="space-y-6">
         <div className="flex justify-between items-center">
-          <h1 className="text-h1-mobile md:text-h1-desktop font-bold text-text-titleText">Gestión de Artículos</h1>
+          <h1 className="text-h1-mobile md:text-h1-desktop font-bold text-primary">Gestión de Artículos</h1>
         </div>
         <TableSkeleton rows={6} columns={5} />
       </div>
@@ -128,7 +126,7 @@ const filteredCategories = categories.filter(
   return (
     <div className="space-y-6  ">
       <div className="flex justify-between items-center">
-        <h1 className="text-h1-mobile md:text-h1-desktop font-bold text-text-titleText">Gestión de Artículos</h1>
+        <h1 className="text-h1-mobile md:text-h1-desktop font-bold text-primary">Gestión de Artículos</h1>
         <div className="flex justify-end items-center text-black">
 
           <button onClick={handleCreateArticle} className="btn-outline ml-4">

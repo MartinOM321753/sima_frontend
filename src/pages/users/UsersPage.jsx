@@ -118,7 +118,7 @@ const UsersPage = () => {
     return (
       <div className="space-y-6">
         <div className="flex justify-between items-center">
-          <h1 className="text-h1-mobile md:text-h1-desktop font-bold text-text-titleText">Gestión de Usuarios</h1>
+          <h1 className=" font-bold text-primary">Gestión de Usuarios</h1>
         </div>
         <TableSkeleton rows={6} columns={4} />
       </div>
@@ -128,7 +128,7 @@ const UsersPage = () => {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center p-1">
-        <h1 className="text-h1-mobile md:text-h1-desktop font-bold text-text-titleText">Gestión de Usuarios</h1>
+        <h1 className="text-h1-mobile md:text-h1-desktop font-bold text-primary">Gestión de Usuarios</h1>
         <div className="flex justify-end items-center text-black mx-2">
           <button onClick={handleCreateUser} className="btn-outline ml-4">
             Registrar Usuario

@@ -113,7 +113,7 @@ const ArticlesPage = () => {
     return (
       <div className="space-y-6">
         <div className="flex justify-between items-center">
-          <h1 className="text-h1-mobile md:text-h1-desktop font-bold text-text-titleText">Gestión de Artículos</h1>
+          <h1 className="text-h1-mobile md:text-h1-desktop font-bold text-primary">Gestión de Artículos</h1>
         </div>
         <TableSkeleton rows={6} columns={5} />
       </div>
@@ -123,7 +123,7 @@ const ArticlesPage = () => {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-h1-mobile md:text-h1-desktop font-bold text-text-titleText">Gestión de Artículos</h1>
+        <h1 className="text-h1-mobile md:text-h1-desktop font-bold text-primary">Gestión de Artículos</h1>
         <div className="flex justify-end items-center text-black">
           <button onClick={handleCreateArticle} className="btn-outline ml-4">
             Agregar Artículo

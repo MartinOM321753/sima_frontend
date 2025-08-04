@@ -13,7 +13,7 @@ module.exports = {
         secondary: "#6A9C89",
         accent: "#C4DAD2",
         section: "#F9F9F9",
-        titleText : "#FFF",
+        titleText : "#16423C",
         text: "#626766",
         "text-primary": "#323635",
       },
